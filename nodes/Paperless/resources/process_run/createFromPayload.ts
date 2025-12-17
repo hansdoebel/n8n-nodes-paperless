@@ -1,0 +1,230 @@
+import type {
+  IDataObject,
+  IExecuteFunctions,
+  IHttpRequestOptions,
+  INodeExecutionData,
+  INodeProperties,
+} from "n8n-workflow";
+import { API_ENDPOINTS } from "../../utils/constants";
+
+const showForProcessRunCreateFromPayload = {
+  operation: ["createFromPayload"],
+  resource: ["process_run"],
+};
+
+export const processRunCreateFromPayloadDescription: INodeProperties[] = [
+  {
+    displayName: "Operation",
+    name: "operation",
+    type: "hidden",
+    default: "createFromPayload",
+  },
+  {
+    displayName: "Method",
+    name: "method",
+    type: "options",
+    default: "published",
+    options: [
+      {
+        name: "Published Version",
+        value: "published",
+        description: "Use published version of ProcessDefinition",
+      },
+      {
+        name: "Specific Version",
+        value: "specific",
+        description: "Use specific ProcessDefinitionVersion",
+      },
+    ],
+    displayOptions: {
+      show: showForProcessRunCreateFromPayload,
+    },
+  },
+  {
+    displayName: "Process Definition ID",
+    name: "process_definition_id",
+    type: "number",
+    required: true,
+    default: 0,
+    displayOptions: {
+      show: {
+        ...showForProcessRunCreateFromPayload,
+        method: ["published"],
+      },
+    },
+    typeOptions: {
+      minValue: 1,
+      numberPrecision: 0,
+    },
+    description: "ID of the ProcessDefinition",
+  },
+  {
+    displayName: "Process Definition Version ID",
+    name: "process_definition_version_id",
+    type: "number",
+    required: true,
+    default: 0,
+    displayOptions: {
+      show: {
+        ...showForProcessRunCreateFromPayload,
+        method: ["specific"],
+      },
+    },
+    typeOptions: {
+      minValue: 1,
+      numberPrecision: 0,
+    },
+    description: "ID of the ProcessDefinitionVersion",
+  },
+  {
+    displayName: "Workspace ID",
+    name: "workspace_id",
+    type: "number",
+    required: true,
+    default: 0,
+    displayOptions: {
+      show: showForProcessRunCreateFromPayload,
+    },
+    typeOptions: {
+      minValue: 1,
+      numberPrecision: 0,
+    },
+    description: "ID of the workspace",
+  },
+  {
+    displayName: "Payload",
+    name: "payload",
+    type: "json",
+    required: true,
+    default: "{}",
+    displayOptions: {
+      show: showForProcessRunCreateFromPayload,
+    },
+    description: "Custom input payload",
+  },
+  {
+    displayName: "Additional Fields",
+    name: "additionalFields",
+    type: "collection",
+    placeholder: "Add Field",
+    default: {},
+    displayOptions: {
+      show: showForProcessRunCreateFromPayload,
+    },
+    options: [
+      {
+        displayName: "Custom Data",
+        name: "custom_data",
+        type: "json",
+        default: "{}",
+        description: "Custom data object",
+      },
+      {
+        displayName: "Label Slugs",
+        name: "label_slugs",
+        type: "string",
+        default: "",
+        description: "Comma-separated label slugs (pattern: ^[a-zA-Z0-9_]+$)",
+      },
+      {
+        displayName: "State",
+        name: "state",
+        type: "string",
+        default: "",
+        description: "State of the process run",
+      },
+      {
+        displayName: "Test Run",
+        name: "test_run",
+        type: "boolean",
+        default: false,
+        description: "Whether this is a test run",
+      },
+    ],
+  },
+];
+
+function buildCreateFromPayloadBody(this: IExecuteFunctions): IDataObject {
+  const body: IDataObject = {};
+  const method = this.getNodeParameter("method", 0) as string;
+
+  if (method === "published") {
+    body.process_definition_id = this.getNodeParameter(
+      "process_definition_id",
+      0,
+    ) as number;
+  } else {
+    body.process_definition_version_id = this.getNodeParameter(
+      "process_definition_version_id",
+      0,
+    ) as number;
+  }
+
+  body.workspace_id = this.getNodeParameter("workspace_id", 0) as number;
+
+  const payload = this.getNodeParameter("payload", 0);
+  body.payload = typeof payload === "string" ? JSON.parse(payload) : payload;
+
+  const additional =
+    (this.getNodeParameter("additionalFields", 0, {}) || {}) as IDataObject;
+
+  if (additional.test_run !== undefined) {
+    body.test_run = additional.test_run;
+  }
+  if (additional.state) {
+    body.state = additional.state;
+  }
+  if (additional.label_slugs) {
+    const labelSlugs = (additional.label_slugs as string)
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s);
+    if (labelSlugs.length) {
+      body.label_slugs = labelSlugs;
+    }
+  }
+  if (additional.custom_data) {
+    try {
+      body.custom_data = typeof additional.custom_data === "string"
+        ? JSON.parse(additional.custom_data)
+        : additional.custom_data;
+    } catch {
+      body.custom_data = additional.custom_data;
+    }
+  }
+
+  return body;
+}
+
+export async function processRunCreateFromPayload(
+  this: IExecuteFunctions,
+): Promise<INodeExecutionData[]> {
+  const body = buildCreateFromPayloadBody.call(this);
+
+  const credentials = await this.getCredentials("paperlessApi");
+  const accessToken = credentials?.accessToken as string;
+
+  const headers: IDataObject = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${accessToken}`,
+  };
+
+  const requestOptions: IHttpRequestOptions = {
+    method: "POST",
+    baseURL: API_ENDPOINTS.BASE_URL,
+    url: API_ENDPOINTS.PROCESS_RUNS_CREATE,
+    body,
+    headers,
+  };
+
+  const responseData = await this.helpers.httpRequest!(requestOptions);
+
+  const executionData: INodeExecutionData = {
+    json: responseData,
+  };
+
+  return [executionData];
+}
+
+export default processRunCreateFromPayloadDescription;

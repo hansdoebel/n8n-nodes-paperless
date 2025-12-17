@@ -1,0 +1,69 @@
+{
+	"name": "n8n-nodes-paperless",
+	"version": "0.1.0",
+	"description": "Paperless.io API community node for n8n — automate digital signage workflows.",
+	"license": "MIT",
+	"homepage": "https://github.com/hansdoebel/n8n-nodes-paperless",
+	"keywords": [
+		"n8n-community-node-package",
+		"n8n-community-node",
+		"n8n",
+		"n8n-node",
+		"workflow-automation",
+		"automation",
+		"paperless",
+		"digital-signage",
+		"signage"
+	],
+	"author": {
+		"name": "Hans Doebel",
+		"email": "dev@hansdoebel.de"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/hansdoebel/n8n-nodes-paperless.git"
+	},
+	"bugs": {
+		"url": "https://github.com/hansdoebel/n8n-nodes-paperless/issues"
+	},
+	"engines": {
+		"node": ">=18.10",
+		"pnpm": ">=10.25.0"
+	},
+	"scripts": {
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"release": "n8n-node release",
+		"prepublishOnly": "n8n-node prerelease"
+	},
+	"files": [
+		"dist"
+	],
+	"funding": {
+		"type": "buymeacoffee",
+		"url": "https://buymeacoffee.com/hansdoebel"
+	},
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"strict": true,
+		"credentials": [
+			"dist/credentials/PaperlessApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Paperless/Paperless.node.js"
+		]
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "^0.17.0",
+		"eslint": "9.39.2",
+		"prettier": "3.7.4",
+		"release-it": "^19.1.0",
+		"typescript": "5.9.3"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	}
+}
