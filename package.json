@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-paperless",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Paperless.io API community node for n8n — automate digital signage workflows.",
 	"license": "MIT",
 	"homepage": "https://github.com/hansdoebel/n8n-nodes-paperless",
