@@ -1,9 +1,7 @@
 import type { INodeProperties } from "n8n-workflow";
-import { blobCreateDescription } from "./create";
+import { blobCreate, blobCreateDescription } from "./create";
 
-const showOnlyForBlob = {
-  resource: ["blob"],
-};
+export { blobCreate };
 
 export const blobDescription: INodeProperties[] = [
   {
@@ -12,7 +10,9 @@ export const blobDescription: INodeProperties[] = [
     type: "options",
     noDataExpression: true,
     displayOptions: {
-      show: showOnlyForBlob,
+      show: {
+        resource: ["blob"],
+      },
     },
     options: [
       {

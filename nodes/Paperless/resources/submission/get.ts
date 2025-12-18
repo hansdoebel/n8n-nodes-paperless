@@ -1,16 +1,13 @@
 import type {
   IDataObject,
   IExecuteFunctions,
-  IHttpRequestOptions,
   INodeExecutionData,
   INodeProperties,
 } from "n8n-workflow";
-import { API_ENDPOINTS } from "../../utils/constants";
+import { NodeOperationError } from "n8n-workflow";
 
-const showForSubmissionGet = {
-  operation: ["get"],
-  resource: ["submission"],
-};
+import { API_ENDPOINTS } from "../../utils/constants";
+import { buildQs, paperlessRequest } from "../../utils/helpers";
 
 export const submissionGetDescription: INodeProperties[] = [
   {
@@ -20,7 +17,10 @@ export const submissionGetDescription: INodeProperties[] = [
     required: true,
     default: 0,
     displayOptions: {
-      show: showForSubmissionGet,
+      show: {
+        operation: ["get"],
+        resource: ["submission"],
+      },
     },
     typeOptions: {
       minValue: 1,
@@ -35,7 +35,10 @@ export const submissionGetDescription: INodeProperties[] = [
     placeholder: "Add Field",
     default: {},
     displayOptions: {
-      show: showForSubmissionGet,
+      show: {
+        operation: ["get"],
+        resource: ["submission"],
+      },
     },
     options: [
       {
@@ -70,44 +73,30 @@ export async function submissionGet(
   this: IExecuteFunctions,
 ): Promise<INodeExecutionData[]> {
   const submissionId = this.getNodeParameter("submission_id", 0) as number;
+  if (!submissionId) {
+    throw new NodeOperationError(this.getNode(), "submission_id is required");
+  }
+
   const additional =
     (this.getNodeParameter("additionalFields", 0, {}) || {}) as IDataObject;
+
+  const qs = buildQs(additional, {
+    disposition: "disposition",
+    expand: "expand",
+  });
 
   const credentials = await this.getCredentials("paperlessApi");
   const accessToken = credentials?.accessToken as string;
 
-  const qs: IDataObject = {};
-
-  if (additional.disposition) {
-    qs.disposition = additional.disposition;
-  }
-
-  const expandList = additional.expand as string[] | undefined;
-  if (Array.isArray(expandList) && expandList.length) {
-    qs.expand = expandList.join(",");
-  }
-
-  const headers: IDataObject = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${accessToken}`,
-  };
-
-  const requestOptions: IHttpRequestOptions = {
+  const response = await paperlessRequest.call(this, accessToken, {
     method: "GET",
-    baseURL: API_ENDPOINTS.BASE_URL,
     url: API_ENDPOINTS.SUBMISSIONS_GET(submissionId.toString()),
     qs,
-    headers,
-  };
+  });
 
-  const responseData = await this.helpers.httpRequest!(requestOptions);
-
-  const executionData: INodeExecutionData = {
-    json: responseData,
-  };
-
-  return [executionData];
+  return this.helpers.returnJsonArray(
+    Array.isArray(response) ? response : [response],
+  );
 }
 
 export default submissionGetDescription;

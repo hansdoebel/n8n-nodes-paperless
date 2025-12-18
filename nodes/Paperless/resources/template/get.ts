@@ -1,9 +1,13 @@
-import type { INodeProperties } from "n8n-workflow";
+import type {
+  IDataObject,
+  IExecuteFunctions,
+  INodeExecutionData,
+  INodeProperties,
+} from "n8n-workflow";
+import { NodeOperationError } from "n8n-workflow";
 
-const showOnlyForTemplateGet = {
-  operation: ["get"],
-  resource: ["template"],
-};
+import { API_ENDPOINTS } from "../../utils/constants";
+import { buildQs, paperlessRequest } from "../../utils/helpers";
 
 export const templateGetDescription: INodeProperties[] = [
   {
@@ -15,7 +19,10 @@ export const templateGetDescription: INodeProperties[] = [
     placeholder: "e.g. 311",
     description: "ID of the template to retrieve",
     displayOptions: {
-      show: showOnlyForTemplateGet,
+      show: {
+        operation: ["get"],
+        resource: ["template"],
+      },
     },
   },
   {
@@ -24,7 +31,10 @@ export const templateGetDescription: INodeProperties[] = [
     type: "collection",
     placeholder: "Add Field",
     displayOptions: {
-      show: showOnlyForTemplateGet,
+      show: {
+        operation: ["get"],
+        resource: ["template"],
+      },
     },
     default: {},
     options: [
@@ -64,7 +74,7 @@ export const templateGetDescription: INodeProperties[] = [
       //
       // Expandable properties
       // The type Template contains the following expandable properties:
-
+      //
       //     creator
       //     designs
       //     participants
@@ -74,3 +84,35 @@ export const templateGetDescription: INodeProperties[] = [
     ],
   },
 ];
+
+export async function templateGet(
+  this: IExecuteFunctions,
+): Promise<INodeExecutionData[]> {
+  const templateId = this.getNodeParameter("templateId", 0) as string;
+  if (!templateId) {
+    throw new NodeOperationError(this.getNode(), "templateId is required");
+  }
+
+  const additional =
+    (this.getNodeParameter("additionalFields", 0, {}) || {}) as IDataObject;
+
+  const qs = buildQs(additional, {
+    expand: "expand",
+    workspace_id: "workspace_id",
+  });
+
+  const credentials = await this.getCredentials("paperlessApi");
+  const accessToken = credentials?.accessToken as string;
+
+  const response = await paperlessRequest.call(this, accessToken, {
+    method: "GET",
+    url: API_ENDPOINTS.TEMPLATES_GET(templateId),
+    qs,
+  });
+
+  return this.helpers.returnJsonArray(
+    Array.isArray(response) ? response : [response],
+  );
+}
+
+export default templateGetDescription;

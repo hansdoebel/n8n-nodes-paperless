@@ -1,4 +1,12 @@
-import type { INodeProperties } from "n8n-workflow";
+import type {
+  IDataObject,
+  IExecuteFunctions,
+  INodeExecutionData,
+  INodeProperties,
+} from "n8n-workflow";
+
+import { API_ENDPOINTS } from "../../utils/constants";
+import { buildQs, paperlessRequest } from "../../utils/helpers";
 
 const showForDocumentGetMany = {
   operation: ["getAll"],
@@ -89,5 +97,37 @@ export const documentGetManyDescription: INodeProperties[] = [
     ],
   },
 ];
+
+export async function documentGetAll(
+  this: IExecuteFunctions,
+): Promise<INodeExecutionData[]> {
+  const additional =
+    (this.getNodeParameter("additionalFields", 0, {}) || {}) as IDataObject;
+
+  const qs = buildQs(additional, {
+    archived: "archived",
+    count: "count",
+    creator_id: "creator_id",
+    page: "page",
+    per: (v: unknown) => ["per_page", v],
+    q: "q",
+    sort: "sort",
+    template_id: "template_id",
+    workspace_id: "workspace_id",
+  });
+
+  const credentials = await this.getCredentials("paperlessApi");
+  const accessToken = credentials?.accessToken as string;
+
+  const response = await paperlessRequest.call(this, accessToken, {
+    method: "GET",
+    url: API_ENDPOINTS.DOCUMENTS_GET_ALL,
+    qs,
+  });
+
+  return this.helpers.returnJsonArray(
+    Array.isArray(response) ? response : [response],
+  );
+}
 
 export default documentGetManyDescription;

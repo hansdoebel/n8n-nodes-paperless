@@ -1,11 +1,11 @@
 import type {
   IDataObject,
   IExecuteFunctions,
-  IHttpRequestOptions,
   INodeExecutionData,
   INodeProperties,
 } from "n8n-workflow";
 import { API_ENDPOINTS } from "../../utils/constants";
+import { paperlessRequest } from "../../utils/helpers";
 
 const showForDocumentCreateFromScratch = {
   operation: ["createFromScratch"],
@@ -160,34 +160,23 @@ export async function documentCreateFromScratch(
     (this.getNodeParameter("additionalFields", 0, {}) || {}) as IDataObject;
   const paperlessVersion = (additional.paperless_version as string) || "";
 
+  const headers: IDataObject | undefined = paperlessVersion
+    ? { "Paperless-Version": paperlessVersion }
+    : undefined;
+
   const credentials = await this.getCredentials("paperlessApi");
   const accessToken = credentials?.accessToken as string;
 
-  const headers: IDataObject = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${accessToken}`,
-  };
-
-  const requestOptions: IHttpRequestOptions = {
+  const response = await paperlessRequest.call(this, accessToken, {
     method: "POST",
-    baseURL: API_ENDPOINTS.BASE_URL,
     url: API_ENDPOINTS.DOCUMENTS_CREATE,
     body,
     headers,
-  };
+  });
 
-  if (paperlessVersion) {
-    headers["Paperless-Version"] = paperlessVersion;
-  }
-
-  const responseData = await this.helpers.httpRequest!(requestOptions);
-
-  const executionData: INodeExecutionData = {
-    json: responseData,
-  };
-
-  return [executionData];
+  return this.helpers.returnJsonArray(
+    Array.isArray(response) ? response : [response],
+  );
 }
 
 export default documentCreateFromScratchDescription;

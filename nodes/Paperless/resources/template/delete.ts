@@ -1,16 +1,11 @@
 import type {
   IDataObject,
   IExecuteFunctions,
-  IHttpRequestOptions,
   INodeExecutionData,
   INodeProperties,
 } from "n8n-workflow";
-import { API_ENDPOINTS } from "../../utils/constants";
-
-const showForTemplateDelete = {
-  operation: ["delete"],
-  resource: ["template"],
-};
+import { NodeOperationError } from "n8n-workflow";
+import { paperlessRequest } from "../../utils/helpers";
 
 export const templateDeleteDescription: INodeProperties[] = [
   {
@@ -20,7 +15,10 @@ export const templateDeleteDescription: INodeProperties[] = [
     required: true,
     default: "",
     displayOptions: {
-      show: showForTemplateDelete,
+      show: {
+        operation: ["delete"],
+        resource: ["template"],
+      },
     },
     description: "ID of the template to delete",
   },
@@ -31,7 +29,10 @@ export const templateDeleteDescription: INodeProperties[] = [
     placeholder: "Add Field",
     default: {},
     displayOptions: {
-      show: showForTemplateDelete,
+      show: {
+        operation: ["delete"],
+        resource: ["template"],
+      },
     },
     options: [
       {
@@ -73,6 +74,9 @@ export async function templateDelete(
   this: IExecuteFunctions,
 ): Promise<INodeExecutionData[]> {
   const templateId = this.getNodeParameter("templateId", 0) as string;
+  if (!templateId) {
+    throw new NodeOperationError(this.getNode(), "templateId is required");
+  }
 
   const additional =
     (this.getNodeParameter("additionalFields", 0, {}) || {}) as IDataObject;
@@ -84,35 +88,23 @@ export async function templateDelete(
   }
 
   const paperlessVersion = (additional.paperless_version as string) || "";
+  const headers: IDataObject | undefined = paperlessVersion
+    ? { "Paperless-Version": paperlessVersion }
+    : undefined;
 
-  // Get credentials for Authorization header
   const credentials = await this.getCredentials("paperlessApi");
   const accessToken = credentials?.accessToken as string;
 
-  const headers: IDataObject = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${accessToken}`,
-  };
-  const requestOptions: IHttpRequestOptions = {
+  const response = await paperlessRequest.call(this, accessToken, {
     method: "DELETE",
-    baseURL: API_ENDPOINTS.BASE_URL,
     url: `/templates/${templateId}`,
     qs,
     headers,
-  };
+  });
 
-  if (paperlessVersion) {
-    headers["Paperless-Version"] = paperlessVersion;
-  }
-
-  const responseData = await this.helpers.httpRequest!(requestOptions);
-
-  const executionData: INodeExecutionData = {
-    json: responseData,
-  };
-
-  return [executionData];
+  return this.helpers.returnJsonArray(
+    Array.isArray(response) ? response : [response],
+  );
 }
 
 export default templateDeleteDescription;

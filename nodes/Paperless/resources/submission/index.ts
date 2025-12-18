@@ -1,5 +1,7 @@
 import type { INodeProperties } from "n8n-workflow";
-import { submissionGetDescription } from "./get";
+import { submissionGet, submissionGetDescription } from "./get";
+
+export { submissionGet };
 
 const showOnlyForSubmission = {
   resource: ["submission"],

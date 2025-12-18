@@ -1,9 +1,17 @@
 import type { INodeProperties } from "n8n-workflow";
-import { templateGetManyDescription } from "./getAll";
-import { templateGetDescription } from "./get";
-import { templateCreateDescription } from "./create";
-import { templateUpdateDescription } from "./update";
-import { templateDeleteDescription } from "./delete";
+import { templateGetAll, templateGetManyDescription } from "./getAll";
+import { templateGet, templateGetDescription } from "./get";
+import { templateCreate, templateCreateDescription } from "./create";
+import { templateUpdate, templateUpdateDescription } from "./update";
+import { templateDelete, templateDeleteDescription } from "./delete";
+
+export {
+  templateCreate,
+  templateDelete,
+  templateGet,
+  templateGetAll,
+  templateUpdate,
+};
 
 const showOnlyForTemplates = {
   resource: ["template"],

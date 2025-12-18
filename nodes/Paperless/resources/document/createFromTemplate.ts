@@ -1,11 +1,11 @@
 import type {
   IDataObject,
   IExecuteFunctions,
-  IHttpRequestOptions,
   INodeExecutionData,
   INodeProperties,
 } from "n8n-workflow";
 import { API_ENDPOINTS } from "../../utils/constants";
+import { paperlessRequest } from "../../utils/helpers";
 
 const showForDocumentCreateFromTemplate = {
   operation: ["createFromTemplate"],
@@ -175,25 +175,17 @@ export async function documentCreateFromTemplate(
   const credentials = await this.getCredentials("paperlessApi");
   const accessToken = credentials?.accessToken as string;
 
-  const headers: IDataObject = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${accessToken}`,
-  };
-
-  const requestOptions: IHttpRequestOptions = {
-    method: "POST",
-    baseURL: API_ENDPOINTS.BASE_URL,
-    url: API_ENDPOINTS.DOCUMENTS_CREATE,
-    body,
-    headers,
-  };
-
+  const headers: IDataObject = {};
   if (paperlessVersion) {
     headers["Paperless-Version"] = paperlessVersion;
   }
 
-  const responseData = await this.helpers.httpRequest!(requestOptions);
+  const responseData = await paperlessRequest.call(this, accessToken, {
+    method: "POST",
+    url: API_ENDPOINTS.DOCUMENTS_CREATE,
+    body,
+    headers: Object.keys(headers).length ? headers : undefined,
+  });
 
   const executionData: INodeExecutionData = {
     json: responseData,

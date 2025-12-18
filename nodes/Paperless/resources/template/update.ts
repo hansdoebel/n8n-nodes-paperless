@@ -1,16 +1,12 @@
 import type {
   IDataObject,
   IExecuteFunctions,
-  IHttpRequestOptions,
   INodeExecutionData,
   INodeProperties,
 } from "n8n-workflow";
-import { API_ENDPOINTS } from "../../utils/constants";
+import { NodeOperationError } from "n8n-workflow";
 
-const showForTemplateUpdate = {
-  operation: ["update"],
-  resource: ["template"],
-};
+import { paperlessRequest } from "../../utils/helpers";
 
 export const templateUpdateDescription: INodeProperties[] = [
   {
@@ -21,7 +17,10 @@ export const templateUpdateDescription: INodeProperties[] = [
     default: "",
     placeholder: "e.g. 311",
     displayOptions: {
-      show: showForTemplateUpdate,
+      show: {
+        operation: ["update"],
+        resource: ["template"],
+      },
     },
     description: "ID of the template to update",
   },
@@ -32,7 +31,10 @@ export const templateUpdateDescription: INodeProperties[] = [
     placeholder: "Add Field",
     default: {},
     displayOptions: {
-      show: showForTemplateUpdate,
+      show: {
+        operation: ["update"],
+        resource: ["template"],
+      },
     },
     options: [
       {
@@ -208,6 +210,10 @@ export async function templateUpdate(
   this: IExecuteFunctions,
 ): Promise<INodeExecutionData[]> {
   const templateId = this.getNodeParameter("templateId", 0) as string;
+  if (!templateId) {
+    throw new NodeOperationError(this.getNode(), "templateId is required");
+  }
+
   const additional =
     (this.getNodeParameter("additionalFields", 0, {}) || {}) as IDataObject;
 
@@ -220,35 +226,24 @@ export async function templateUpdate(
   }
 
   const paperlessVersion = (additional.paperless_version as string) || "";
+  const headers: IDataObject | undefined = paperlessVersion
+    ? { "Paperless-Version": paperlessVersion }
+    : undefined;
 
   const credentials = await this.getCredentials("paperlessApi");
   const accessToken = credentials?.accessToken as string;
 
-  const headers: IDataObject = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${accessToken}`,
-  };
-  const requestOptions: IHttpRequestOptions = {
+  const response = await paperlessRequest.call(this, accessToken, {
     method: "PATCH",
-    baseURL: API_ENDPOINTS.BASE_URL,
     url: `/templates/${templateId}`,
     body,
     qs,
     headers,
-  };
+  });
 
-  if (paperlessVersion) {
-    headers["Paperless-Version"] = paperlessVersion;
-  }
-
-  const responseData = await this.helpers.httpRequest!(requestOptions);
-
-  const executionData: INodeExecutionData = {
-    json: responseData,
-  };
-
-  return [executionData];
+  return this.helpers.returnJsonArray(
+    Array.isArray(response) ? response : [response],
+  );
 }
 
 export default templateUpdateDescription;

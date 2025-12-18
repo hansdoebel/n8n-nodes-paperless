@@ -1,10 +1,21 @@
 import type { INodeProperties } from "n8n-workflow";
-import { processRunCreateFromScratchDescription } from "./createFromScratch";
-import { processRunCreateFromSubmissionDescription } from "./createFromSubmission";
-import { processRunCreateFromPayloadDescription } from "./createFromPayload";
+import {
+  processRunCreateFromPayload,
+  processRunCreateFromPayloadDescription,
+} from "./createFromPayload";
+import {
+  processRunCreateFromScratch,
+  processRunCreateFromScratchDescription,
+} from "./createFromScratch";
+import {
+  processRunCreateFromSubmission,
+  processRunCreateFromSubmissionDescription,
+} from "./createFromSubmission";
 
-const showOnlyForProcessRun = {
-  resource: ["process_run"],
+export {
+  processRunCreateFromPayload,
+  processRunCreateFromScratch,
+  processRunCreateFromSubmission,
 };
 
 export const processRunsDescription: INodeProperties[] = [
@@ -14,7 +25,9 @@ export const processRunsDescription: INodeProperties[] = [
     type: "options",
     noDataExpression: true,
     displayOptions: {
-      show: showOnlyForProcessRun,
+      show: {
+        resource: ["process_run"],
+      },
     },
     options: [
       {

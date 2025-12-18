@@ -1,16 +1,39 @@
 import type { INodeProperties } from "n8n-workflow";
-import { documentGetCreationParametersDescription } from "./getCreationParameters";
-import { documentGetManyDescription } from "./getAll";
-import { documentGetDescription } from "./get";
-import { documentCreateFromTemplateDescription } from "./createFromTemplate";
-import { documentDuplicateDescription } from "./duplicateDocument";
-import { documentCreateFromPdfDescription } from "./createFromPdf";
-import { documentCreateFromScratchDescription } from "./createFromScratch";
-import { documentUpdateDescription } from "./update";
-import { documentDeleteDescription } from "./delete";
+import {
+  documentGetCreationParameters,
+  documentGetCreationParametersDescription,
+} from "./getCreationParameters";
+import { documentGetAll, documentGetManyDescription } from "./getAll";
+import { documentGet, documentGetDescription } from "./get";
+import {
+  documentCreateFromTemplate,
+  documentCreateFromTemplateDescription,
+} from "./createFromTemplate";
+import {
+  documentDuplicate,
+  documentDuplicateDescription,
+} from "./duplicateDocument";
+import {
+  documentCreateFromPdf,
+  documentCreateFromPdfDescription,
+} from "./createFromPdf";
+import {
+  documentCreateFromScratch,
+  documentCreateFromScratchDescription,
+} from "./createFromScratch";
+import { documentUpdate, documentUpdateDescription } from "./update";
+import { documentDelete, documentDeleteDescription } from "./delete";
 
-const showOnlyForDocument = {
-  resource: ["document"],
+export {
+  documentCreateFromPdf,
+  documentCreateFromScratch,
+  documentCreateFromTemplate,
+  documentDelete,
+  documentDuplicate,
+  documentGet,
+  documentGetAll,
+  documentGetCreationParameters,
+  documentUpdate,
 };
 
 export const documentDescription: INodeProperties[] = [
@@ -20,23 +43,25 @@ export const documentDescription: INodeProperties[] = [
     type: "options",
     noDataExpression: true,
     displayOptions: {
-      show: showOnlyForDocument,
+      show: {
+        resource: ["document"],
+      },
     },
     options: [
       {
-        name: 'Create From PDF',
+        name: "Create From PDF",
         value: "createFromPdf",
         action: "Create a document from PDF",
         description: "Create a new document from a PDF file",
       },
       {
-        name: 'Create From Scratch',
+        name: "Create From Scratch",
         value: "createFromScratch",
         action: "Create a document from scratch",
         description: "Create a new document from scratch",
       },
       {
-        name: 'Create From Template',
+        name: "Create From Template",
         value: "createFromTemplate",
         action: "Create a document from template",
         description: "Create a new document from a template",
