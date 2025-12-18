@@ -1,5 +1,3 @@
-// Docs: https://developers.paperless.io/docs/api/d65d979d4a988-create-a-new-document
-
 import type {
   IDataObject,
   IExecuteFunctions,

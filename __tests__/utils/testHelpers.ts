@@ -7,6 +7,45 @@ import type {
   INodeParameters,
 } from "n8n-workflow";
 
+function normalizeUrl(url: string): string {
+  return url.replace(/\/+$/, "");
+}
+
+function isAbsoluteUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url);
+}
+
+function getActualUrl(actualCall: IHttpRequestOptions): string | undefined {
+  if (!actualCall.url) return undefined;
+  const url = actualCall.url;
+  if (isAbsoluteUrl(url)) return url;
+
+  const baseURL = actualCall.baseURL;
+  if (!baseURL) return url;
+
+  return `${baseURL.replace(/\/+$/, "")}/${url.replace(/^\/+/, "")}`;
+}
+
+function matchesExpectedUrl(
+  actualCall: IHttpRequestOptions,
+  expectedUrl: string,
+): boolean {
+  const expected = normalizeUrl(expectedUrl);
+
+  const actualRaw = actualCall.url ? normalizeUrl(actualCall.url) : undefined;
+  const actualFull = getActualUrl(actualCall)
+    ? normalizeUrl(getActualUrl(actualCall)!)
+    : undefined;
+
+  if (!actualRaw && !actualFull) return false;
+
+  if (isAbsoluteUrl(expected)) {
+    return actualFull === expected;
+  }
+
+  return actualRaw === expected || actualFull === expected;
+}
+
 /**
  * Creates a mock IExecuteFunctions context for testing n8n nodes
  */
@@ -105,7 +144,7 @@ export function assertHttpRequest(
   }
 
   if (expectedOptions.url) {
-    expect(actualCall.url).toBe(expectedOptions.url);
+    expect(matchesExpectedUrl(actualCall, expectedOptions.url)).toBe(true);
   }
 
   if (expectedOptions.baseURL) {

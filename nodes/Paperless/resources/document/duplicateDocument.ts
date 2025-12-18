@@ -137,10 +137,7 @@ export const documentDuplicateDescription: INodeProperties[] = [
 function buildDuplicateBody(this: IExecuteFunctions): IDataObject {
   const body: IDataObject = {};
 
-  // Note: the node execution expects `documentId` for identifying the source document
-  // and uses `additionalFields` for optional values.
-  // This keeps the handler compatible with the current `Paperless.node.ts` dispatch.
-  const documentId = this.getNodeParameter("documentId", 0) as string;
+  const documentId = this.getNodeParameter("document_id", 0) as number | string;
   if (documentId) body.document_id = documentId;
 
   const additional =
@@ -175,9 +172,9 @@ function buildDuplicateBody(this: IExecuteFunctions): IDataObject {
 export async function documentDuplicate(
   this: IExecuteFunctions,
 ): Promise<INodeExecutionData[]> {
-  const documentId = this.getNodeParameter("documentId", 0) as string;
+  const documentId = this.getNodeParameter("document_id", 0) as number | string;
   if (!documentId) {
-    throw new NodeOperationError(this.getNode(), "documentId is required");
+    throw new NodeOperationError(this.getNode(), "document_id is required");
   }
 
   const body = buildDuplicateBody.call(this);
@@ -193,33 +190,9 @@ export async function documentDuplicate(
   const credentials = await this.getCredentials("paperlessApi");
   const accessToken = credentials?.accessToken as string;
 
-  const duplicateEndpoint = (API_ENDPOINTS as Partial<
-    typeof API_ENDPOINTS & {
-      DOCUMENTS_DUPLICATE: string | ((id: string) => string);
-      DOCUMENT_DUPLICATE: string | ((id: string) => string);
-    }
-  >).DOCUMENTS_DUPLICATE ??
-    (API_ENDPOINTS as Partial<
-      typeof API_ENDPOINTS & {
-        DOCUMENTS_DUPLICATE: string | ((id: string) => string);
-        DOCUMENT_DUPLICATE: string | ((id: string) => string);
-      }
-    >).DOCUMENT_DUPLICATE;
-
-  if (!duplicateEndpoint) {
-    throw new NodeOperationError(
-      this.getNode(),
-      "Duplicate endpoint is not configured (missing API_ENDPOINTS.DOCUMENTS_DUPLICATE).",
-    );
-  }
-
-  const url = typeof duplicateEndpoint === "function"
-    ? duplicateEndpoint(documentId)
-    : duplicateEndpoint;
-
   const response = await paperlessRequest.call(this, accessToken, {
     method: "POST",
-    url,
+    url: API_ENDPOINTS.DOCUMENTS_CREATE,
     body,
     headers,
   });

@@ -4,6 +4,7 @@ import { Paperless } from "../../nodes/Paperless/Paperless.node";
 import { API_ENDPOINTS } from "../../nodes/Paperless/utils/constants";
 import {
   assertAuthorizationHeader,
+  assertHttpRequest,
   createMockCredentials,
   createMockExecuteFunctions,
 } from "../utils/testHelpers";
@@ -131,12 +132,10 @@ describe("Paperless Node", () => {
 
         await paperlessNode.execute.call(mockExecuteFunctions);
 
-        const actualRequest = mockHttpRequest.mock
-          .calls[0][0] as IHttpRequestOptions;
-        expect(actualRequest.method).toBe("GET");
-        expect(actualRequest.url).toBe(
-          `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.TEMPLATES_GET_ALL}`,
-        );
+        assertHttpRequest(mockHttpRequest, {
+          method: "GET",
+          url: `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.TEMPLATES_GET_ALL}`,
+        });
       });
 
       it("should pass credentials to API request", async () => {
@@ -156,8 +155,7 @@ describe("Paperless Node", () => {
 
         await paperlessNode.execute.call(mockExecuteFunctions);
 
-        const actualRequest = mockHttpRequest.mock
-          .calls[0][0] as IHttpRequestOptions;
+        const actualRequest = mockHttpRequest.mock.calls[0][0] as any;
         assertAuthorizationHeader(actualRequest.headers as any, accessToken);
       });
     });
@@ -180,12 +178,10 @@ describe("Paperless Node", () => {
 
         await paperlessNode.execute.call(mockExecuteFunctions);
 
-        const actualRequest = mockHttpRequest.mock
-          .calls[0][0] as IHttpRequestOptions;
-        expect(actualRequest.method).toBe("GET");
-        expect(actualRequest.url).toBe(
-          `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.TEMPLATES_GET("311")}`,
-        );
+        assertHttpRequest(mockHttpRequest, {
+          method: "GET",
+          url: `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.TEMPLATES_GET("311")}`,
+        });
       });
 
       it("should throw error when templateId is empty", async () => {
@@ -298,12 +294,10 @@ describe("Paperless Node", () => {
 
         await paperlessNode.execute.call(mockExecuteFunctions);
 
-        const actualRequest = mockHttpRequest.mock
-          .calls[0][0] as IHttpRequestOptions;
-        expect(actualRequest.method).toBe("GET");
-        expect(actualRequest.url).toBe(
-          `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.DOCUMENTS_GET_ALL}`,
-        );
+        assertHttpRequest(mockHttpRequest, {
+          method: "GET",
+          url: `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.DOCUMENTS_GET_ALL}`,
+        });
       });
 
       it("should support pagination parameters", async () => {
@@ -397,12 +391,10 @@ describe("Paperless Node", () => {
 
         await paperlessNode.execute.call(mockExecuteFunctions);
 
-        const actualRequest = mockHttpRequest.mock
-          .calls[0][0] as IHttpRequestOptions;
-        expect(actualRequest.method).toBe("GET");
-        expect(actualRequest.url).toBe(
-          `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.DOCUMENTS_GET("123")}`,
-        );
+        assertHttpRequest(mockHttpRequest, {
+          method: "GET",
+          url: `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.DOCUMENTS_GET("123")}`,
+        });
       });
 
       it("should throw error when documentId is empty", async () => {
@@ -440,12 +432,11 @@ describe("Paperless Node", () => {
 
         await paperlessNode.execute.call(mockExecuteFunctions);
 
-        const actualRequest = mockHttpRequest.mock
-          .calls[0][0] as IHttpRequestOptions;
-        expect(actualRequest.method).toBe("OPTIONS");
-        expect(actualRequest.url).toBe(
-          `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.DOCUMENTS_CREATION_PARAMETERS}`,
-        );
+        assertHttpRequest(mockHttpRequest, {
+          method: "OPTIONS" as unknown as "GET",
+          url:
+            `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.DOCUMENTS_CREATION_PARAMETERS}`,
+        });
       });
 
       it("should include document_id in body when provided", async () => {

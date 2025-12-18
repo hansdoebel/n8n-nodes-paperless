@@ -250,7 +250,6 @@ function buildCreateBody(this: IExecuteFunctions): IDataObject {
   body.workspace_id = workspaceId;
   body.name = name;
 
-  // Top-level optional fields
   const templateId = this.getNodeParameter("template_id", 0) as string;
   if (templateId) {
     body.template_id = templateId;
@@ -283,7 +282,6 @@ function buildCreateBody(this: IExecuteFunctions): IDataObject {
     "styles",
   ];
 
-  // Additional fields collection
   const additional =
     (this.getNodeParameter("additionalFields", 0, {}) || {}) as IDataObject;
 
@@ -292,7 +290,6 @@ function buildCreateBody(this: IExecuteFunctions): IDataObject {
       key in additional && additional[key] !== undefined &&
       additional[key] !== ""
     ) {
-      // For settings-like fields, they may be JSON strings when entered in UI.
       if (
         key === "settings" ||
         key === "reminder_settings" ||
@@ -303,10 +300,8 @@ function buildCreateBody(this: IExecuteFunctions): IDataObject {
         const raw = additional[key] as string;
         if (raw === "") continue;
         try {
-          // allow passing actual objects too
           body[key] = typeof raw === "string" ? JSON.parse(raw) : raw;
         } catch {
-          // If parse fails, pass the raw value (the API will likely error). Caller should ensure valid JSON.
           body[key] = raw;
         }
       } else {
@@ -315,7 +310,6 @@ function buildCreateBody(this: IExecuteFunctions): IDataObject {
     }
   }
 
-  // Map forwarding/delegation if present as booleans (they may already be booleans)
   if ("forwarding_allowed" in additional) {
     body.forwarding_allowed = !!additional.forwarding_allowed;
   }
@@ -323,38 +317,26 @@ function buildCreateBody(this: IExecuteFunctions): IDataObject {
     body.delegation_allowed = !!additional.delegation_allowed;
   }
 
-  // Expand parameter is sent as query, not in body. Leave here to be read by execute.
   return body;
 }
 
-/**
- * Execute function for creating a template.
- * Call this using: await templateCreate.call(this);
- *
- * Returns an array of INodeExecutionData (single item containing the JSON response).
- */
 export async function templateCreate(
   this: IExecuteFunctions,
 ): Promise<INodeExecutionData[]> {
   const body = buildCreateBody.call(this);
-
-  // Build query params
   const expand = (this.getNodeParameter("additionalFields.expand", 0, []) ||
     []) as string[];
   const qs: IDataObject = {};
   if (Array.isArray(expand) && expand.length) {
-    // API expects comma-separated expand values
     qs.expand = expand.join(",");
   }
 
-  // Optional header Paperless-Version
   const paperlessVersion = this.getNodeParameter(
     "additionalFields.paperless_version",
     0,
     "",
   ) as string;
 
-  // Get credentials for Authorization header
   const credentials = await this.getCredentials("paperlessApi");
   const accessToken = credentials?.accessToken as string;
 

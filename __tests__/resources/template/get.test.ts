@@ -1,6 +1,6 @@
-import type { IHttpRequestOptions } from "n8n-workflow";
 import { API_ENDPOINTS } from "../../../nodes/Paperless/utils/constants";
 import {
+  assertHttpRequest,
   createMockCredentials,
   createMockExecuteFunctions,
 } from "../../utils/testHelpers";
@@ -36,12 +36,10 @@ describe("Template Resource - Get Operation", () => {
 
       await paperlessNode.execute.call(mockExecuteFunctions);
 
-      const actualRequest = mockHttpRequest.mock
-        .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.method).toBe("GET");
-      expect(actualRequest.url).toBe(
-        `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.TEMPLATES_GET("311")}`,
-      );
+      assertHttpRequest(mockHttpRequest, {
+        method: "GET",
+        url: `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.TEMPLATES_GET("311")}`,
+      });
     });
 
     it("should throw error when templateId is missing", async () => {
@@ -81,8 +79,7 @@ describe("Template Resource - Get Operation", () => {
 
       await paperlessNode.execute.call(mockExecuteFunctions);
 
-      const actualRequest = mockHttpRequest.mock
-        .calls[0][0] as IHttpRequestOptions;
+      const actualRequest = mockHttpRequest.mock.calls[0][0] as any;
       expect(actualRequest.headers?.Authorization).toBe(
         `Bearer ${accessToken}`,
       );
@@ -109,8 +106,7 @@ describe("Template Resource - Get Operation", () => {
 
       await paperlessNode.execute.call(mockExecuteFunctions);
 
-      const actualRequest = mockHttpRequest.mock
-        .calls[0][0] as IHttpRequestOptions;
+      const actualRequest = mockHttpRequest.mock.calls[0][0] as any;
       expect(actualRequest.qs).toHaveProperty(
         "expand",
         "creator,participants,blocks",
@@ -136,8 +132,7 @@ describe("Template Resource - Get Operation", () => {
 
       await paperlessNode.execute.call(mockExecuteFunctions);
 
-      const actualRequest = mockHttpRequest.mock
-        .calls[0][0] as IHttpRequestOptions;
+      const actualRequest = mockHttpRequest.mock.calls[0][0] as any;
       expect(actualRequest.qs).toHaveProperty("expand", "creator,designs");
     });
 
@@ -160,8 +155,7 @@ describe("Template Resource - Get Operation", () => {
 
       await paperlessNode.execute.call(mockExecuteFunctions);
 
-      const actualRequest = mockHttpRequest.mock
-        .calls[0][0] as IHttpRequestOptions;
+      const actualRequest = mockHttpRequest.mock.calls[0][0] as any;
       expect(actualRequest.qs).toHaveProperty("workspace_id", 1206);
     });
 
@@ -184,8 +178,7 @@ describe("Template Resource - Get Operation", () => {
 
       await paperlessNode.execute.call(mockExecuteFunctions);
 
-      const actualRequest = mockHttpRequest.mock
-        .calls[0][0] as IHttpRequestOptions;
+      const actualRequest = mockHttpRequest.mock.calls[0][0] as any;
       expect(actualRequest.qs?.expand).toBeUndefined();
     });
   });
@@ -238,11 +231,9 @@ describe("Template Resource - Get Operation", () => {
 
         await paperlessNode.execute.call(mockExecuteFunctions);
 
-        const actualRequest = mockHttpRequest.mock
-          .calls[0][0] as IHttpRequestOptions;
-        expect(actualRequest.url).toBe(
-          `${API_ENDPOINTS.BASE_URL}/templates/${templateId}`,
-        );
+        assertHttpRequest(mockHttpRequest, {
+          url: `${API_ENDPOINTS.BASE_URL}/templates/${templateId}`,
+        });
 
         jest.clearAllMocks();
       }

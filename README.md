@@ -97,4 +97,5 @@ Generate this token in your Paperless instance admin panel and provide it when s
 
 ## Version history
 
-- 0.1.0 – Initial release with Blob, Document, Process Run, Submission, and Template resources.
+- 0.1.2 – added tests, refactor.
+- 0.1.1 – Initial release with Blob, Document, Process Run, Submission, and Template resources.
