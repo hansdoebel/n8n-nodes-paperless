@@ -2,7 +2,6 @@ import type { IHttpRequestOptions } from "n8n-workflow";
 import { API_ENDPOINTS } from "../../../nodes/Paperless/utils/constants";
 import {
   assertAuthorizationHeader,
-  assertCommonHeaders,
   assertHttpRequest,
   createMockCredentials,
   createMockExecuteFunctions,
@@ -39,8 +38,8 @@ describe("Template Resource - GetAll Operation", () => {
 
       assertHttpRequest(mockHttpRequest, {
         method: "GET",
-        baseURL: API_ENDPOINTS.BASE_URL,
-        url: API_ENDPOINTS.TEMPLATES_GET_ALL,
+        
+        url: `${API_ENDPOINTS.BASE_URL}${API_ENDPOINTS.TEMPLATES_GET_ALL}`,
       });
     });
 

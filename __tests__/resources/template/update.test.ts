@@ -1,4 +1,4 @@
-import type { IHttpRequestOptions } from "n8n-workflow";
+import type { IDataObject, IHttpRequestOptions } from "n8n-workflow";
 import { templateUpdate } from "../../../nodes/Paperless/resources/template/update";
 import { API_ENDPOINTS } from "../../../nodes/Paperless/utils/constants";
 import {
@@ -89,7 +89,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.name).toBe("Updated Template Name");
+      expect((actualRequest.body as IDataObject)?.name).toBe("Updated Template Name");
     });
 
     it("should include description when provided", async () => {
@@ -111,7 +111,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.description).toBe("Updated description");
+      expect((actualRequest.body as IDataObject)?.description).toBe("Updated description");
     });
 
     it("should include original_content_locale when provided", async () => {
@@ -133,7 +133,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.original_content_locale).toBe("de-DE");
+      expect((actualRequest.body as IDataObject)?.original_content_locale).toBe("de-DE");
     });
 
     it("should include rendering_locale when provided", async () => {
@@ -155,7 +155,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.rendering_locale).toBe("fr-FR");
+      expect((actualRequest.body as IDataObject)?.rendering_locale).toBe("fr-FR");
     });
 
     it("should include participant_completed_redirect_url when provided", async () => {
@@ -177,7 +177,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.participant_completed_redirect_url).toBe(
+      expect((actualRequest.body as IDataObject)?.participant_completed_redirect_url).toBe(
         "https://example.com/updated",
       );
     });
@@ -227,8 +227,8 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.forwarding_allowed).toBe(true);
-      expect(typeof actualRequest.body?.forwarding_allowed).toBe("boolean");
+      expect((actualRequest.body as IDataObject)?.forwarding_allowed).toBe(true);
+      expect(typeof (actualRequest.body as IDataObject)?.forwarding_allowed).toBe("boolean");
     });
 
     it("should include forwarding_allowed as false", async () => {
@@ -250,7 +250,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.forwarding_allowed).toBe(false);
+      expect((actualRequest.body as IDataObject)?.forwarding_allowed).toBe(false);
     });
 
     it("should include delegation_allowed as true", async () => {
@@ -272,8 +272,8 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.delegation_allowed).toBe(true);
-      expect(typeof actualRequest.body?.delegation_allowed).toBe("boolean");
+      expect((actualRequest.body as IDataObject)?.delegation_allowed).toBe(true);
+      expect(typeof (actualRequest.body as IDataObject)?.delegation_allowed).toBe("boolean");
     });
 
     it("should include delegation_allowed as false", async () => {
@@ -295,7 +295,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.delegation_allowed).toBe(false);
+      expect((actualRequest.body as IDataObject)?.delegation_allowed).toBe(false);
     });
   });
 
@@ -320,7 +320,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.settings).toEqual(settings);
+      expect((actualRequest.body as IDataObject)?.settings).toEqual(settings);
     });
 
     it("should parse and include reminder_settings JSON", async () => {
@@ -343,7 +343,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.reminder_settings).toEqual(reminderSettings);
+      expect((actualRequest.body as IDataObject)?.reminder_settings).toEqual(reminderSettings);
     });
 
     it("should parse and include content_locale_settings JSON", async () => {
@@ -366,7 +366,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.content_locale_settings).toEqual(
+      expect((actualRequest.body as IDataObject)?.content_locale_settings).toEqual(
         contentLocaleSettings,
       );
     });
@@ -394,7 +394,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.localized_attributes).toEqual(
+      expect((actualRequest.body as IDataObject)?.localized_attributes).toEqual(
         localizedAttributes,
       );
     });
@@ -419,7 +419,7 @@ describe("Template Resource - Update Operation", () => {
 
       const actualRequest = mockHttpRequest.mock
         .calls[0][0] as IHttpRequestOptions;
-      expect(actualRequest.body?.styles).toEqual(styles);
+      expect((actualRequest.body as IDataObject)?.styles).toEqual(styles);
     });
 
     it("should not include JSON fields when empty string", async () => {

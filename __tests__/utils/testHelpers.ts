@@ -2,11 +2,9 @@ import type {
   ICredentialDataDecryptedObject,
   IDataObject,
   IExecuteFunctions,
-  IGetNodeParameterOptions,
   IHttpRequestOptions,
   INode,
-  INodeExecutionData,
-  IWorkflowExecuteAdditionalData,
+  INodeParameters,
 } from "n8n-workflow";
 
 /**
@@ -26,6 +24,21 @@ export function createMockExecuteFunctions(
       if (nodeParameters.has(key)) {
         return nodeParameters.get(key);
       }
+
+      // Handle nested parameter names like "additionalFields.expand"
+      if (parameterName.includes(".")) {
+        const parts = parameterName.split(".");
+        let value: any = parameters;
+        for (const part of parts) {
+          if (value && typeof value === "object" && part in value) {
+            value = (value as any)[part];
+          } else {
+            return fallback;
+          }
+        }
+        return value;
+      }
+
       return fallback;
     },
   );
@@ -39,11 +52,11 @@ export function createMockExecuteFunctions(
     type: "n8n-nodes-paperless.paperless",
     typeVersion: 1,
     position: [0, 0],
-    parameters: parameters,
+    parameters: parameters as INodeParameters,
   };
 
   const mockContext: Partial<IExecuteFunctions> = {
-    getNodeParameter: mockGetNodeParameter,
+    getNodeParameter: mockGetNodeParameter as any,
     getCredentials: mockGetCredentials,
     getNode: () => mockNode,
     helpers: {
@@ -171,4 +184,11 @@ export function assertAuthorizationHeader(
 export function assertCommonHeaders(headers: IDataObject) {
   expect(headers).toHaveProperty("Accept", "application/json");
   expect(headers).toHaveProperty("Content-Type", "application/json");
+}
+
+/**
+ * Safely casts request body to IDataObject for property access
+ */
+export function getRequestBody(request: IHttpRequestOptions): IDataObject {
+  return request.body as IDataObject;
 }
