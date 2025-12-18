@@ -14,12 +14,6 @@ const showForBlobCreate = {
 
 export const blobCreateDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "create",
-  },
-  {
     displayName: "Filename",
     name: "filename",
     type: "string",

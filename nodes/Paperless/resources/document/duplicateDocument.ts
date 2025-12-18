@@ -14,12 +14,6 @@ const showForDocumentDuplicate = {
 
 export const documentDuplicateDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "duplicateDocument",
-  },
-  {
     displayName: "Workspace ID",
     name: "workspace_id",
     type: "number",

@@ -14,12 +14,6 @@ const showForProcessRunCreateFromPayload = {
 
 export const processRunCreateFromPayloadDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "createFromPayload",
-  },
-  {
     displayName: "Method",
     name: "method",
     type: "options",

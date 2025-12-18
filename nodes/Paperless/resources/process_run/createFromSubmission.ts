@@ -14,12 +14,6 @@ const showForProcessRunCreateFromSubmission = {
 
 export const processRunCreateFromSubmissionDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "createFromSubmission",
-  },
-  {
     displayName: "Method",
     name: "method",
     type: "options",

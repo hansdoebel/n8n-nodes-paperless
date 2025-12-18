@@ -14,12 +14,6 @@ const showForDocumentCreateFromTemplate = {
 
 export const documentCreateFromTemplateDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "createFromTemplate",
-  },
-  {
     displayName: "Workspace ID",
     name: "workspace_id",
     type: "number",

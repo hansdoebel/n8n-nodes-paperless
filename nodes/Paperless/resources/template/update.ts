@@ -14,12 +14,6 @@ const showForTemplateUpdate = {
 
 export const templateUpdateDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "update",
-  },
-  {
     displayName: "Template ID",
     name: "templateId",
     type: "string",

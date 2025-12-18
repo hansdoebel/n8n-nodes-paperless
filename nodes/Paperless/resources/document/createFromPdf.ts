@@ -14,12 +14,6 @@ const showForDocumentCreateFromPdf = {
 
 export const documentCreateFromPdfDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "createFromPdf",
-  },
-  {
     displayName: "Workspace ID",
     name: "workspace_id",
     type: "number",

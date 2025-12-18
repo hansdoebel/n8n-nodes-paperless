@@ -14,12 +14,6 @@ const showForTemplateCreate = {
 
 export const templateCreateDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "create",
-  },
-  {
     displayName: "Workspace ID",
     name: "workspace_id",
     type: "number",

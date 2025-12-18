@@ -14,12 +14,6 @@ const showForProcessRunCreateFromScratch = {
 
 export const processRunCreateFromScratchDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "createFromScratch",
-  },
-  {
     displayName: "Method",
     name: "method",
     type: "options",

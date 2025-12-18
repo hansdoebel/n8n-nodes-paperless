@@ -14,12 +14,6 @@ const showForDocumentCreateFromScratch = {
 
 export const documentCreateFromScratchDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "createFromScratch",
-  },
-  {
     displayName: "Workspace ID",
     name: "workspace_id",
     type: "number",

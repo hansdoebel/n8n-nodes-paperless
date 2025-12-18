@@ -14,12 +14,6 @@ const showForDocumentUpdate = {
 
 export const documentUpdateDescription: INodeProperties[] = [
   {
-    displayName: "Operation",
-    name: "operation",
-    type: "hidden",
-    default: "update",
-  },
-  {
     displayName: "Document ID",
     name: "documentId",
     type: "string",
