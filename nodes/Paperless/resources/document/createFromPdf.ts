@@ -19,6 +19,7 @@ export const documentCreateFromPdfDescription: INodeProperties[] = [
     type: "number",
     required: true,
     default: 0,
+    placeholder: "e.g. 1234",
     displayOptions: {
       show: showForDocumentCreateFromPdf,
     },

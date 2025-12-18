@@ -80,6 +80,13 @@ Generate this token in your Paperless instance admin panel and provide it when s
 
 ----
 
+## Roadmap
+
+- [ ] Webhooks
+
+
+----
+
 ## Resources
 
 - [Paperless API docs](https://developers.paperless.io/docs/api)

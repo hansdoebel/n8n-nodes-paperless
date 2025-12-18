@@ -44,6 +44,7 @@ export const documentCreateDescription: INodeProperties[] = [
         name: "document_id",
         type: "number",
         default: 0,
+        placeholder: "e.g. 12345",
         displayOptions: {
           show: showForDocumentCreate,
         },
